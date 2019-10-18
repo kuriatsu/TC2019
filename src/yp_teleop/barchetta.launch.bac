@@ -1,0 +1,43 @@
+<launch>
+
+  <arg name="camera_serial" default="16400756" />
+
+  <node pkg="nodelet" type="nodelet" name="camera_nodelet_manager" args="manager" />
+
+  <node pkg="nodelet" type="nodelet" name="camera_nodelet"
+          args="load pointgrey_camera_driver/PointGreyCameraNodelet camera_nodelet_manager" >
+      <param name="serial" value="$(arg camera_serial)" />
+      <param name="format7_roi_width" value="1920" />
+      <param name="format7_roi_height" value="1440" />
+      <param name="format7_x_offset" value="0" />
+      <param name="format7_y_offset" value="0" />
+      <param name="frame_rate" value="10" />
+  </node>
+
+  <node pkg="urg_node" type="urg_node" name="urg_node">
+		<param name="serial_port" value="/dev/serial/by-id/usb-Hokuyo_Data_Flex_for_USB_URG-Series_USB_Driver-if00" />
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="image_proc_debayer"
+        args="load image_proc/debayer camera_nodelet_manager">
+  </node>
+
+
+  <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>
+
+  <node pkg = "joy" name="joy" type="joy_node"/>
+     <param value="/dev/input/js0" name="joy/joy/dev"/>
+
+  <node pkg="teleop" type="yp_teleop_study" name="yp_teleop_study"/>
+
+  <!--node pkg="rviz" type="rviz" name="rviz" args="-d /home/kuriatsu/TC2017/Autoware/ros/src/.config/rviz/tj.rviz"/!-->
+
+
+  <node pkg = "ypspur_ros" name="ypspur_ros" type="ypspur_ros">
+      <param name="param_file" value="/home/kuriatsu/params/icart-middle.param"/>
+      <param name="port" value="/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00"/>
+	  <remap from="tf" to="ypspur_tf"/>
+ </node>
+
+
+</launch>

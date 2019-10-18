@@ -1,0 +1,13 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~start_waypoint" : \b [str] waipoint of start min: , default: 0, max: 
+- \b "~final_waypoint" : \b [str] waipoint of goal min: , default: 305, max: 
+- \b "~base_speed" : \b [double] max speed of joy stick min: 0.0, default: 0.5, max: 1.0
+- \b "~dash" : \b [double] dash speed of RB and RL min: 0.0, default: 0.15, max: 0.5
+- \b "~max_twist_speed" : \b [double] velocity limit min: 0.0, default: 0.8, max: 1.0
+- \b "~acceleration_limit" : \b [double] accelerarion limit m/s^2 min: 0.0, default: 0.25, max: 1.0
+- \b "~deceleration_limit" : \b [double] decelerarion limit m/s^2 min: 0.0, default: 0.33, max: 1.0
+- \b "~pub_rate" : \b [double] twist publish rate min: 0.0, default: 0.1, max: 0.5
+

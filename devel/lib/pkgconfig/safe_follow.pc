@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/devel
+
+Name: safe_follow
+Description: Description of safe_follow
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/lib 
+Requires: roscpp rospy std_msgs sensor_msgs geometry_msgs nav_msgs laser_geometry jsk_recognition_msgs

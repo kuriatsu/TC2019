@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/kuriatsu/Program/Ros/mad_mobile_ws/devel/setup.sh

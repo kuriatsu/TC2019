@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/devel
+
+Name: yp_teleop
+Description: Description of yp_teleop
+Version: 0.0.0
+Cflags: -I/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/include
+Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/lib 
+Requires: 

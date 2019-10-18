@@ -1,0 +1,27 @@
+<launch>
+
+  <node pkg="urg_node" type="urg_node" name="urg_node">
+		<param name="serial_port" value="/dev/serial/by-id/usb-Hokuyo_Data_Flex_for_USB_URG-Series_USB_Driver-if00" />
+  </node>
+
+  <node name="image_proc" pkg="image_proc" type="image_proc"/>
+
+  <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>
+
+  <node pkg = "joy" name="joy" type="joy_node"/>
+     <param value="/dev/input/js0" name="joy/joy/dev"/>
+
+  <node pkg="teleop" type="yp_teleop_study" name="yp_teleop_study"/>
+
+  <!--node pkg="rviz" type="rviz" name="rviz" args="-d /home/kuriatsu/TC2017/Autoware/ros/src/.config/rviz/tj.rviz"/!-->
+
+
+  <node pkg = "ypspur_ros" name="ypspur_ros" type="ypspur_ros">
+      <param name="param_file" value="/home/kuriatsu/params/icart-middle.param"/>
+      <param name="port" value="/dev/serial/by-id/usb-T-frog_project_T-frog_Driver-if00"/>
+	  <remap from="tf" to="ypspur_tf"/>
+ </node>
+
+ <node pkg="safe_follow" name="safe_follow" type="safe_follow" />
+
+</launch>

@@ -1,0 +1,8 @@
+prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/install
+
+Name: teleop
+Description: Description of teleop
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/install/lib 
+Requires: 
