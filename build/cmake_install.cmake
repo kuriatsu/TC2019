@@ -127,6 +127,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/realsense-ros/realsense2_description/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/ddynamic_reconfigure/cmake_install.cmake")
+  include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/tc_helper/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/realsense-ros/realsense2_camera/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/safe_follow/cmake_install.cmake")
   include("/home/kuriatsu/Program/Ros/mad_mobile_ws/build/test_tools/cmake_install.cmake")

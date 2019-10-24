@@ -66,7 +66,7 @@ YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0)
 
     // ros communication
     sub_joy = n.subscribe("/joy", 1, &YpTeleop::joyCallback, this);
-    sub_twist = n.subscribe("/twist_cmd_safe", 1, &YpTeleop::twistCallback, this);
+    sub_twist = n.subscribe("/twist_cmd_helper", 1, &YpTeleop::twistCallback, this);
     // sub_closest_waypoint = n.subscribe("/closest_waypoint", 1, &YpTeleop::closestWaypointCallback, this);
     pub_yp_cmd = n.advertise<geometry_msgs::Twist>("/ypspur_ros/cmd_vel", 1);
 
@@ -243,9 +243,9 @@ void YpTeleop::joyCallback(const sensor_msgs::Joy &in_msg)
         {
             ROS_INFO("bag_record_on");
             sc.playWave("/usr/share/sounds/robot_sounds/new_world.wav");
-            system_return = system("bash ~/Program/Ros/master_study_ws/src/yp_teleop/src/bag_recorder.sh &");
+            system_return = system("bash ~/Program/Ros/mad_mobile_ws/src/yp_teleop/src/bag_recorder.sh &");
             ros::Duration(2).sleep();
-            system_return = system("bash ~/Program/Ros/master_study_ws/src/yp_teleop/src/bag_checker.sh &");
+            system_return = system("bash ~/Program/Ros/mad_mobile_ws/src/yp_teleop/src/bag_checker.sh &");
             checkSystemError(system_return);
             rosbag_flag = true;
         }
@@ -253,7 +253,7 @@ void YpTeleop::joyCallback(const sensor_msgs::Joy &in_msg)
         {
             ROS_INFO("bag_record_off");
             sc.playWave("/usr/share/sounds/robot_sounds/break_brick_block.wav");
-            system_return = system("bash ~/Program/Ros/master_study_ws/src/yp_teleop/src/bag_stopper.sh &");
+            system_return = system("bash ~/Program/Ros/mad_mobile_ws/src/yp_teleop/src/bag_stopper.sh &");
             checkSystemError(system_return);
             rosbag_flag = false;
         }

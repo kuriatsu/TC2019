@@ -11,10 +11,9 @@
   <node pkg = "joy" name="joy" type="joy_node"/>
      <param value="/dev/input/js0" name="joy/joy/dev"/>
 
-  <node pkg="teleop" type="yp_teleop_study" name="yp_teleop_study"/>
+  <node pkg="yp_teleop" type="yp_teleop" name="yp_teleop"/>
 
   <!--node pkg="rviz" type="rviz" name="rviz" args="-d /home/kuriatsu/TC2017/Autoware/ros/src/.config/rviz/tj.rviz"/!-->
-
 
   <node pkg = "ypspur_ros" name="ypspur_ros" type="ypspur_ros">
       <param name="param_file" value="/home/kuriatsu/params/icart-middle.param"/>

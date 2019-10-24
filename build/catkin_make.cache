@@ -1,2 +1,2 @@
-ddynamic_reconfigure:realsense-ros/realsense2_camera:realsense-ros/realsense2_description:safe_follow:test_tools:yp_teleop:ypspur_ros
+ddynamic_reconfigure:realsense-ros/realsense2_camera:realsense-ros/realsense2_description:safe_follow:tc_helper:test_tools:yp_teleop:ypspur_ros
 -DCATKIN_DEVEL_PREFIX=/home/kuriatsu/Program/Ros/mad_mobile_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kuriatsu/Program/Ros/mad_mobile_ws/install -G Unix Makefiles
