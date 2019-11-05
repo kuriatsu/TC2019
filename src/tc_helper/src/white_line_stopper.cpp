@@ -8,7 +8,8 @@
 #include <visualization_msgs/MarkerArray.h>
 #include <fstream>
 #include <tf/transform_listener.h>
-
+#include <math.h>
+#include <std_msgs/Float32.h>
 
 struct MarkerData
 {
@@ -23,10 +24,12 @@ private:
     ros::Subscriber sub_ndt_pose;
     ros::Publisher pub_marker;
     ros::Publisher pub_corner;
+    ros::Publisher pub_vel_rate;
 
-    bool go_frag;
-    bool intrusion_frag;
     ros::Timer timer;
+    int passed_whiteline_num;
+    int intrusion_whiteline_num;
+    int intrusion_decelerate_num;
 
     visualization_msgs::MarkerArray marker_array;
 
@@ -50,28 +53,28 @@ private:
     void readFile(const std::string &file_name);
     void createWhiteLine();
     double quatToRpy(const geometry_msgs::Quaternion &quat);
-    std::vector<geometry_msgs::Point> getBoxCorner(const geometry_msgs::Pose pose, const float width, const float length)
+    std::vector<geometry_msgs::Point> getBoxCorner(const geometry_msgs::Pose pose, const float width, const float length);
     void createEgoMarker(const geometry_msgs::Pose &ego_pose);
+    void checkIntrusion();
     void pubStampedPoint(const std::vector<geometry_msgs::Point> &point_array);
 };
 
 
-WhiteLineStopper::WhiteLineStopper(): go_frag(true), intrusion_frag(false)
+WhiteLineStopper::WhiteLineStopper(): passed_whiteline_num(0), intrusion_whiteline_num(0)
 {
     ros::NodeHandle n;
 
     sub_joy = n.subscribe("/joy", 1, &WhiteLineStopper::joyCallback, this);
-    sub_twist = n.subscribe("/twist_cmd_safe", 1, &WhiteLineStopper::twistCallback, this);
     sub_ndt_pose = n.subscribe("/ndt_pose", 1, &WhiteLineStopper::poseCallback, this);
     pub_corner = n.advertise<geometry_msgs::PointStamped>("/corner_points", 5);
-    pub_twist = n.advertise<geometry_msgs::Twist>("/twist_cmd_helper", 1);
     pub_marker = n.advertise<visualization_msgs::MarkerArray>("/tc_helper_marker", 1);
+    pub_vel_rate = n.advertise<std_msgs::Float32>("/vel_rate_whiteline_stopper", 1);
 
     whiteline_length = 2.0;
     whiteline_width = 0.5;
     vehicle_length = 0.8;
     vehicle_width = 0.6;
-    decelerate_range = 3.0;
+    whiteline_deceleration = 3.0;
 
     readFile("/home/kuriatsu/Program/Ros/mad_mobile_ws/white_line_list.csv");
     createWhiteLine();
@@ -115,9 +118,9 @@ void WhiteLineStopper::readFile(const std::string &file_name)
         whiteline_pose.orientation.z = std::stof(result.at(6));
         whiteline_pose.orientation.w = std::stof(result.at(7));
 
-        whiteline_data_array.push_back(whiteline_pose, getBoxCorner(whiteline_pose, whiteline_width, whiteline_length));
+        whiteline_data_array.push_back({whiteline_pose, getBoxCorner(whiteline_pose, whiteline_width, whiteline_length)});
 
-        ROS_INFO_STREAM(whiteline_data_array);
+        // ROS_INFO_STREAM(whiteline_data_array);
     }
 }
 
@@ -163,32 +166,39 @@ double WhiteLineStopper::quatToRpy(const geometry_msgs::Quaternion &quat)
 
 void WhiteLineStopper::poseCallback(const geometry_msgs::PoseStamped &ego_pose)
 {
-    createEgoMarker(ego_pose);
-    ego_vehicle_data.pose = ego_pose;
-    ego_vehicle_data.corner_array = getBoxCorner(ego_pose, vehicle_width, vehicle_length);
+    createEgoMarker(ego_pose.pose);
+    ego_vehicle_data.pose = ego_pose.pose;
+    ego_vehicle_data.corner_array = getBoxCorner(ego_pose.pose, vehicle_width, vehicle_length);
 }
 
 
 void WhiteLineStopper::joyCallback(const sensor_msgs::Joy &in_msg)
 {
-    if(go_frag && in_msg.buttons[3])
+    if (in_msg.buttons[3])
     {
-        intrusion_frag = false;
+        passed_whiteline_num = intrusion_whiteline_num;
     }
 }
 
 
 void WhiteLineStopper::timerCallback(const ros::TimerEvent&)
 {
+    float vel_rate = 1.0;
+    checkIntrusion();
 
     pub_marker.publish(marker_array);
-    intrusion_frag = checkIntrusion();
+
+    if (intrusion_decelerate_num != passed_whiteline_num) vel_rate = 0.5;
+    if (intrusion_whiteline_num != passed_whiteline_num) vel_rate = 0.0;
+    pub_vel_rate.publish(vel_rate);
 
     for (auto whiteline_itr = whiteline_data_array.begin(); whiteline_itr != whiteline_data_array.end(); ++whiteline_itr)
     {
-        pubStampedPoint(whiteline_itr.corner_array);
+        pubStampedPoint(whiteline_itr->corner_array);
     }
     pubStampedPoint(ego_vehicle_data.corner_array);
+
+
 }
 
 
@@ -198,10 +208,10 @@ void WhiteLineStopper::pubStampedPoint(const std::vector<geometry_msgs::Point> &
 
     for (auto itr = point_array.begin(); itr != point_array.end(); ++itr)
     {
-        point_stamped.point = itr;
+        point_stamped.point = *itr;
         point_stamped.header.stamp = ros::Time(0);
         point_stamped.header.frame_id = "/map";
-        pub_corner(point_stamped);
+        pub_corner.publish(point_stamped);
     }
 
 }
@@ -210,15 +220,38 @@ void WhiteLineStopper::pubStampedPoint(const std::vector<geometry_msgs::Point> &
 void WhiteLineStopper::checkIntrusion()
 {
     bool frag = false;
+    float outer_product, distance;
+    int whiteline_num;
 
-    for(auto itr=whiteline_data_array.begin(); itr!=whiteline_data_array.end(); ++itr)
+    for (auto itr=whiteline_data_array.begin(); itr!=whiteline_data_array.end(); ++itr)
     {
-        for(int i=0; i<4; i++)
+        distance = sqrt(pow(itr->pose.position.x - ego_vehicle_data.pose.position.x, 2) \
+                        + pow(itr->pose.position.y - ego_vehicle_data.pose.position.y, 2));
+
+        whiteline_num = std::distance(whiteline_data_array.begin(), itr);
+
+        if (distance < whiteline_deceleration && whiteline_num != passed_whiteline_num)
         {
-            //something
+            intrusion_decelerate_num = whiteline_num;
+
+            for (int i=0; i<4; i++)
+            {
+                for (int j=0; j<2; j++)
+                {
+                    outer_product = (itr->corner_array[(i+1)%3].x - itr->corner_array[i].x) \
+                                    * (ego_vehicle_data.corner_array[j].y - itr->corner_array[i].y) \
+                                    - (ego_vehicle_data.corner_array[j].x - itr->corner_array[i].x) \
+                                    * (itr->corner_array[(i+1)%3].y - itr->corner_array[i].y);
+
+                    if (outer_product < 0)
+                    {
+                        intrusion_whiteline_num = whiteline_num;
+                        return;
+                    }
+                }
+            }
         }
     }
-    return frag;
 }
 
 
@@ -226,15 +259,15 @@ void WhiteLineStopper::createWhiteLine()
 {
     visualization_msgs::Marker marker;
 
-    for(auto itr=whiteline_list.begin(); itr != whiteline_list.end(); ++itr)
+    for (auto itr=whiteline_data_array.begin(); itr != whiteline_data_array.end(); ++itr)
     {
         marker.header.frame_id = "map";
         marker.header.stamp = ros::Time(0);
-        marker.id = std::distance(whiteline_list.begin(), itr);
+        marker.id = std::distance(whiteline_data_array.begin(), itr);
         marker.ns = "";
         marker.action = visualization_msgs::Marker::ADD;
         marker.type = visualization_msgs::Marker::CUBE;
-        marker.pose = *itr;
+        marker.pose = itr->pose;
         marker.scale.x = whiteline_width;
         marker.scale.y = whiteline_length;
         marker.scale.z = 0.1;
@@ -246,9 +279,9 @@ void WhiteLineStopper::createWhiteLine()
         marker_array.markers.push_back(marker);
 
         marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.id += std::distance(whiteline_list.begin(), whiteline_list.end());
-        marker.scale.x = decelerate_range;
-        marker.scale.y = decelerate_range;
+        marker.id += std::distance(whiteline_data_array.begin(), whiteline_data_array.end());
+        marker.scale.x = whiteline_deceleration;
+        marker.scale.y = whiteline_deceleration;
         marker.scale.z = 0.1;
         marker.color.r = 0.5;
         marker.color.g = 0.5;
@@ -273,10 +306,10 @@ void WhiteLineStopper::createEgoMarker(const geometry_msgs::Pose &ego_pose)
     ego_vehicle_marker.scale.x = vehicle_length;
     ego_vehicle_marker.scale.y = vehicle_width;
     ego_vehicle_marker.scale.z = 1.2;
-    ego_vehicle_marker.color.r = ego_vehicle_marker.id * (1.0 / whiteline_list.size());
-    ego_vehicle_marker.color.g = 1.0 - ego_vehicle_marker.color.r;
-    ego_vehicle_marker.color.b = 1.0;
-    ego_vehicle_marker.color.a = 1.0;
+    ego_vehicle_marker.color.r = 0.0;
+    ego_vehicle_marker.color.g = 0.5;
+    ego_vehicle_marker.color.b = 0.5;
+    ego_vehicle_marker.color.a = 0.5;
     ego_vehicle_marker.lifetime = ros::Duration();
     marker_array.markers.push_back(ego_vehicle_marker);
 }

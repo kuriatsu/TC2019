@@ -81,6 +81,7 @@ tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/sensor_msgs/PointCloud.h
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/std_msgs/ColorRGBA.h
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/std_msgs/Empty.h
+tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/std_msgs/Float32.h
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/std_msgs/Header.h
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/tf/FrameGraph.h
 tc_helper/CMakeFiles/white_line_stopper_node.dir/src/white_line_stopper.cpp.o: /opt/ros/kinetic/include/tf/FrameGraphRequest.h

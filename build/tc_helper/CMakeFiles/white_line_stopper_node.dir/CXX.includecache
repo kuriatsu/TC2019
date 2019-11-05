@@ -15,11 +15,9 @@ geometry_msgs/Pose.h
 -
 geometry_msgs/PoseStamped.h
 -
+geometry_msgs/Point.h
+-
 geometry_msgs/PointStamped.h
--
-geometry_msgs/Twist.h
--
-geometry_msgs/TwistStamped.h
 -
 visualization_msgs/Marker.h
 -
@@ -28,6 +26,10 @@ visualization_msgs/MarkerArray.h
 fstream
 -
 tf/transform_listener.h
+-
+math.h
+-
+std_msgs/Float32.h
 -
 
 /opt/ros/kinetic/include/boost_161_condition_variable.h
@@ -1089,6 +1091,22 @@ ros/message_operations.h
 -
 
 /opt/ros/kinetic/include/std_msgs/Empty.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/Float32.h
 string
 -
 vector
