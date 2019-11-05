@@ -2,20 +2,25 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
 #include <geometry_msgs/PointStamped.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/TwistStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <fstream>
 #include <tf/transform_listener.h>
+
+
+struct MarkerData
+{
+    geometry_msgs::Pose pose;
+    std::vector<geometry_msgs::Point> corner_array;
+};
+
 class WhiteLineStopper
 {
 private:
     ros::Subscriber sub_joy;
     ros::Subscriber sub_ndt_pose;
-    ros::Subscriber sub_twist;
-    ros::Publisher pub_twist;
     ros::Publisher pub_marker;
     ros::Publisher pub_corner;
 
@@ -24,32 +29,30 @@ private:
     ros::Timer timer;
 
     visualization_msgs::MarkerArray marker_array;
-    std::vector<geometry_msgs::Pose> whiteline_list;
-    std::vector<std::vector<geometry_msgs::Point>> whiteline_corners_list;
-    geometry_msgs::PointStamped whiteline_corner_point1;
-    geometry_msgs::PointStamped whiteline_corner_point2;
-    geometry_msgs::PointStamped whiteline_corner_point3;
-    geometry_msgs::PointStamped whiteline_corner_point4;
+
+    std::vector<MarkerData> whiteline_data_array;
+    MarkerData ego_vehicle_data;
 
     float whiteline_length;
     float whiteline_width;
+    float whiteline_deceleration;
 
     float vehicle_length;
     float vehicle_width;
-    float decelerate_range;
 
 public:
     WhiteLineStopper();
 
 private:
     void joyCallback(const sensor_msgs::Joy &in_msg);
-    void twistCallback(const geometry_msgs::TwistStamped &in_msg);
     void timerCallback(const ros::TimerEvent&);
     void poseCallback(const geometry_msgs::PoseStamped &ego_pose);
     void readFile(const std::string &file_name);
     void createWhiteLine();
     double quatToRpy(const geometry_msgs::Quaternion &quat);
+    std::vector<geometry_msgs::Point> getBoxCorner(const geometry_msgs::Pose pose, const float width, const float length)
     void createEgoMarker(const geometry_msgs::Pose &ego_pose);
+    void pubStampedPoint(const std::vector<geometry_msgs::Point> &point_array);
 };
 
 
@@ -60,9 +63,9 @@ WhiteLineStopper::WhiteLineStopper(): go_frag(true), intrusion_frag(false)
     sub_joy = n.subscribe("/joy", 1, &WhiteLineStopper::joyCallback, this);
     sub_twist = n.subscribe("/twist_cmd_safe", 1, &WhiteLineStopper::twistCallback, this);
     sub_ndt_pose = n.subscribe("/ndt_pose", 1, &WhiteLineStopper::poseCallback, this);
-    pub_corner = n.advertise<geometry_msgs::PointStamped>("/corner_check", 5);
+    pub_corner = n.advertise<geometry_msgs::PointStamped>("/corner_points", 5);
     pub_twist = n.advertise<geometry_msgs::Twist>("/twist_cmd_helper", 1);
-    pub_marker = n.advertise<visualization_msgs::MarkerArray>("/whiteline_marker", 1);
+    pub_marker = n.advertise<visualization_msgs::MarkerArray>("/tc_helper_marker", 1);
 
     whiteline_length = 2.0;
     whiteline_width = 0.5;
@@ -83,9 +86,6 @@ void WhiteLineStopper::readFile(const std::string &file_name)
     std::string line;
     std::ifstream ifs(file_name);
     geometry_msgs::Pose whiteline_pose;
-    std::vector<geometry_msgs::Point> whiteline_corners;
-
-    double whiteline_yaw;
 
     if (!ifs == 2)
     {
@@ -115,34 +115,39 @@ void WhiteLineStopper::readFile(const std::string &file_name)
         whiteline_pose.orientation.z = std::stof(result.at(6));
         whiteline_pose.orientation.w = std::stof(result.at(7));
 
-        whiteline_list.push_back(whiteline_pose);
+        whiteline_data_array.push_back(whiteline_pose, getBoxCorner(whiteline_pose, whiteline_width, whiteline_length));
 
-
-        whiteline_yaw = quatToRpy(whiteline_pose.orientation);
-
-        whiteline_corner_point1.point.x = whiteline_pose.position.x + (whiteline_width*0.5)*cos(whiteline_yaw)-(whiteline_length*0.5)*sin(whiteline_yaw);
-        whiteline_corner_point1.point.y = whiteline_pose.position.y + (whiteline_width*0.5)*sin(whiteline_yaw)+(whiteline_length*0.5)*cos(whiteline_yaw);
-        whiteline_corner_point1.point.z = 0.0;
-        whiteline_corners.push_back(whiteline_corner_point1.point);
-
-        whiteline_corner_point2.point.x = whiteline_pose.position.x + (-whiteline_width*0.5)*cos(whiteline_yaw)-(whiteline_length*0.5)*sin(whiteline_yaw);
-        whiteline_corner_point2.point.y = whiteline_pose.position.y + (-whiteline_width*0.5)*sin(whiteline_yaw)+(whiteline_length*0.5)*cos(whiteline_yaw);
-        whiteline_corner_point2.point.z = 0.0;
-        whiteline_corners.push_back(whiteline_corner_point2.point);
-
-        whiteline_corner_point3.point.x = whiteline_pose.position.x + (-whiteline_width*0.5)*cos(whiteline_yaw)-(-whiteline_length*0.5)*sin(whiteline_yaw);
-        whiteline_corner_point3.point.y = whiteline_pose.position.y + (-whiteline_width*0.5)*sin(whiteline_yaw)+(-whiteline_length*0.5)*cos(whiteline_yaw);
-        whiteline_corner_point3.point.z = 0.0;
-        whiteline_corners.push_back(whiteline_corner_point3.point);
-
-        whiteline_corner_point4.point.x = whiteline_pose.position.x + (whiteline_width*0.5)*cos(whiteline_yaw)-(-whiteline_length*0.5)*sin(whiteline_yaw);
-        whiteline_corner_point4.point.y = whiteline_pose.position.y + (whiteline_width*0.5)*sin(whiteline_yaw)+(-whiteline_length*0.5)*cos(whiteline_yaw);
-        whiteline_corner_point4.point.z = 0.0;
-        whiteline_corners.push_back(whiteline_corner_point4.point);
-
-        whiteline_corners_list.push_back(whiteline_corners);
-        ROS_INFO_STREAM(whiteline_corner_point1);
+        ROS_INFO_STREAM(whiteline_data_array);
     }
+}
+
+
+std::vector<geometry_msgs::Point> WhiteLineStopper::getBoxCorner(const geometry_msgs::Pose pose, const float width, const float length)
+{
+    geometry_msgs::Point corner;
+    std::vector<geometry_msgs::Point> corner_array;
+    double yaw;
+
+    yaw = quatToRpy(pose.orientation);
+
+    corner.x = pose.position.x + (width * 0.5) * cos(yaw) - (length * 0.5) * sin(yaw);
+    corner.y = pose.position.y + (width * 0.5) * sin(yaw) + (length * 0.5) * cos(yaw);
+    corner.z = 0.0;
+    corner_array.push_back(corner);
+
+    corner.x = pose.position.x + (-width * 0.5) * cos(yaw) - (length * 0.5) * sin(yaw);
+    corner.y = pose.position.y + (-width * 0.5) * sin(yaw) + (length * 0.5) * cos(yaw);
+    corner_array.push_back(corner);
+
+    corner.x = pose.position.x + (-width * 0.5) * cos(yaw) - (-length * 0.5) * sin(yaw);
+    corner.y = pose.position.y + (-width * 0.5) * sin(yaw) + (-length * 0.5) * cos(yaw);
+    corner_array.push_back(corner);
+
+    corner.x = pose.position.x + (width * 0.5) * cos(yaw) - (-length * 0.5) * sin(yaw);
+    corner.y = pose.position.y + (width * 0.5) * sin(yaw) + (-length * 0.5) * cos(yaw);
+    corner_array.push_back(corner);
+
+    return corner_array;
 }
 
 
@@ -156,38 +161,11 @@ double WhiteLineStopper::quatToRpy(const geometry_msgs::Quaternion &quat)
 }
 
 
-void WhiteLineStopper::twistCallback(const geometry_msgs::TwistStamped &in_msg)
+void WhiteLineStopper::poseCallback(const geometry_msgs::PoseStamped &ego_pose)
 {
-    geometry_msgs::Twist in_twist;
-    geometry_msgs::Twist out_twist;
-
-    in_twist.linear.x = in_msg.twist.linear.x;
-    in_twist.angular.z = in_msg.twist.angular.z;
-
-    if (!go_frag)
-    {
-        out_twist.linear.x = 0.0;
-        out_twist.angular.z = 0.0;
-    }
-    else
-    {
-        out_twist = in_twist;
-    }
-
-    pub_twist.publish(out_twist);
-
-}
-
-
-void WhiteLineStopper::poseCallback(const geometry_msgs::PoseStamped &in_msg)
-{
-    // for(auto itr=whiteline_list.begin(); itr != whiteline_list.end(); ++itr)
-    // {
-    //     if(abs(in_msg.pose.position.x - itr->position.x) < vehicle_decelerate_width && abs(in_msg.pose.position.y - itr->position.y) < vehicle_decelerate_width)
-    //     {
-    //
-    //     }
-    // }
+    createEgoMarker(ego_pose);
+    ego_vehicle_data.pose = ego_pose;
+    ego_vehicle_data.corner_array = getBoxCorner(ego_pose, vehicle_width, vehicle_length);
 }
 
 
@@ -195,8 +173,52 @@ void WhiteLineStopper::joyCallback(const sensor_msgs::Joy &in_msg)
 {
     if(go_frag && in_msg.buttons[3])
     {
-        go_frag == true;
+        intrusion_frag = false;
     }
+}
+
+
+void WhiteLineStopper::timerCallback(const ros::TimerEvent&)
+{
+
+    pub_marker.publish(marker_array);
+    intrusion_frag = checkIntrusion();
+
+    for (auto whiteline_itr = whiteline_data_array.begin(); whiteline_itr != whiteline_data_array.end(); ++whiteline_itr)
+    {
+        pubStampedPoint(whiteline_itr.corner_array);
+    }
+    pubStampedPoint(ego_vehicle_data.corner_array);
+}
+
+
+void WhiteLineStopper::pubStampedPoint(const std::vector<geometry_msgs::Point> &point_array)
+{
+    geometry_msgs::PointStamped point_stamped;
+
+    for (auto itr = point_array.begin(); itr != point_array.end(); ++itr)
+    {
+        point_stamped.point = itr;
+        point_stamped.header.stamp = ros::Time(0);
+        point_stamped.header.frame_id = "/map";
+        pub_corner(point_stamped);
+    }
+
+}
+
+
+void WhiteLineStopper::checkIntrusion()
+{
+    bool frag = false;
+
+    for(auto itr=whiteline_data_array.begin(); itr!=whiteline_data_array.end(); ++itr)
+    {
+        for(int i=0; i<4; i++)
+        {
+            //something
+        }
+    }
+    return frag;
 }
 
 
@@ -233,7 +255,6 @@ void WhiteLineStopper::createWhiteLine()
         marker.color.b = 0;
         // decelerate_range_marker.lifetime = ros::Duration();
         marker_array.markers.push_back(marker);
-
     }
 }
 
@@ -258,28 +279,6 @@ void WhiteLineStopper::createEgoMarker(const geometry_msgs::Pose &ego_pose)
     ego_vehicle_marker.color.a = 1.0;
     ego_vehicle_marker.lifetime = ros::Duration();
     marker_array.markers.push_back(ego_vehicle_marker);
-
-
-}
-
-
-void WhiteLineStopper::timerCallback(const ros::TimerEvent&)
-{
-    whiteline_corner_point1.header.frame_id = "/map";
-    whiteline_corner_point1.header.stamp = ros::Time(0);
-    whiteline_corner_point2.header.frame_id = "/map";
-    whiteline_corner_point2.header.stamp = ros::Time(0);
-    whiteline_corner_point3.header.frame_id = "/map";
-    whiteline_corner_point3.header.stamp = ros::Time(0);
-    whiteline_corner_point4.header.frame_id = "/map";
-    whiteline_corner_point4.header.stamp = ros::Time(0);
-    pub_marker.publish(marker_array);
-    pub_corner.publish(whiteline_corner_point1);
-    pub_corner.publish(whiteline_corner_point3);
-    pub_corner.publish(whiteline_corner_point2);
-    pub_corner.publish(whiteline_corner_point4);
-
-
 }
 
 
