@@ -545,6 +545,19 @@ geometry_msgs_generate_messages_py/fast:
 .PHONY : geometry_msgs_generate_messages_py/fast
 
 #=============================================================================
+# Target rules for targets named sensor_msgs_generate_messages_cpp
+
+# Build rule for target.
+sensor_msgs_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sensor_msgs_generate_messages_cpp
+.PHONY : sensor_msgs_generate_messages_cpp
+
+# fast build rule for target.
+sensor_msgs_generate_messages_cpp/fast:
+	$(MAKE) -f tc_helper/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build.make tc_helper/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build
+.PHONY : sensor_msgs_generate_messages_cpp/fast
+
+#=============================================================================
 # Target rules for targets named sensor_msgs_generate_messages_lisp
 
 # Build rule for target.
@@ -584,6 +597,19 @@ geometry_msgs_generate_messages_eus/fast:
 .PHONY : geometry_msgs_generate_messages_eus/fast
 
 #=============================================================================
+# Target rules for targets named whiteline_stopper_node
+
+# Build rule for target.
+whiteline_stopper_node: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 whiteline_stopper_node
+.PHONY : whiteline_stopper_node
+
+# fast build rule for target.
+whiteline_stopper_node/fast:
+	$(MAKE) -f tc_helper/CMakeFiles/whiteline_stopper_node.dir/build.make tc_helper/CMakeFiles/whiteline_stopper_node.dir/build
+.PHONY : whiteline_stopper_node/fast
+
+#=============================================================================
 # Target rules for targets named sensor_msgs_generate_messages_eus
 
 # Build rule for target.
@@ -621,32 +647,6 @@ sensor_msgs_generate_messages_py: cmake_check_build_system
 sensor_msgs_generate_messages_py/fast:
 	$(MAKE) -f tc_helper/CMakeFiles/sensor_msgs_generate_messages_py.dir/build.make tc_helper/CMakeFiles/sensor_msgs_generate_messages_py.dir/build
 .PHONY : sensor_msgs_generate_messages_py/fast
-
-#=============================================================================
-# Target rules for targets named sensor_msgs_generate_messages_cpp
-
-# Build rule for target.
-sensor_msgs_generate_messages_cpp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 sensor_msgs_generate_messages_cpp
-.PHONY : sensor_msgs_generate_messages_cpp
-
-# fast build rule for target.
-sensor_msgs_generate_messages_cpp/fast:
-	$(MAKE) -f tc_helper/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build.make tc_helper/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build
-.PHONY : sensor_msgs_generate_messages_cpp/fast
-
-#=============================================================================
-# Target rules for targets named white_line_stopper_node
-
-# Build rule for target.
-white_line_stopper_node: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 white_line_stopper_node
-.PHONY : white_line_stopper_node
-
-# fast build rule for target.
-white_line_stopper_node/fast:
-	$(MAKE) -f tc_helper/CMakeFiles/white_line_stopper_node.dir/build.make tc_helper/CMakeFiles/white_line_stopper_node.dir/build
-.PHONY : white_line_stopper_node/fast
 
 #=============================================================================
 # Target rules for targets named realsense2_camera
@@ -2419,14 +2419,14 @@ help:
 	@echo "... geometry_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_py"
+	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_lisp"
 	@echo "... geometry_msgs_generate_messages_eus"
+	@echo "... whiteline_stopper_node"
 	@echo "... sensor_msgs_generate_messages_eus"
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... sensor_msgs_generate_messages_py"
-	@echo "... sensor_msgs_generate_messages_cpp"
-	@echo "... white_line_stopper_node"
 	@echo "... realsense2_camera"
 	@echo "... realsense2_camera_genpy"
 	@echo "... realsense2_camera_generate_messages_nodejs"
