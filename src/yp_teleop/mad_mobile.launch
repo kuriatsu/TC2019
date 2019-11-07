@@ -21,6 +21,6 @@
 	  <remap from="tf" to="ypspur_tf"/>
  </node>
 
- <node pkg="safe_follow" name="safe_follow" type="safe_follow" />
-
+ <!-- <node pkg="safe_follow" name="safe_follow_yoko_node" type="safe_follow_yoko.py" /> -->
+ <node pkg = "tc_helper" type="white_line_stopper_node" name="whiteline_stopper"/>
 </launch>
