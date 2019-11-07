@@ -35,7 +35,7 @@ private:
     visualization_msgs::MarkerArray marker_array;
 
     std::vector<MarkerData> whiteline_data_array;
-    geometry_msgs::Pose ego_vehicle_pose;
+    geometry_msgs::Pose ego_pose;
 
     float whiteline_length;
     float whiteline_width;
@@ -55,7 +55,7 @@ private:
     void createWhiteLine();
     double quatToRpy(const geometry_msgs::Quaternion &quat);
     std::vector<geometry_msgs::Point> getBoxCorner(const geometry_msgs::Pose pose, const float width, const float length);
-    void createEgoMarker(const geometry_msgs::Pose &ego_pose);
+    void createEgoMarker(const geometry_msgs::Pose &in_pose);
     void checkIntrusion();
     void pubStampedPoint(const std::vector<geometry_msgs::Point> &point_array);
 };
@@ -165,13 +165,13 @@ double WhiteLineStopper::quatToRpy(const geometry_msgs::Quaternion &quat)
 }
 
 
-void WhiteLineStopper::poseCallback(const geometry_msgs::PoseStamped &ego_pose)
+void WhiteLineStopper::poseCallback(const geometry_msgs::PoseStamped &in_pose)
 {
     // std::vector<geometry_msgs::Point> vehicle_point
 
     createEgoMarker(ego_pose.pose);
     // ego_vehicle_data.id = 0;
-    ego_vehicle_pose = ego_pose.pose;
+    ego_pose = ego_pose.pose;
     // ego_vehicle_data.corner_array = getBoxCorner(ego_pose.pose, vehicle_width, vehicle_length);
     // ego_vehicle_data.corner_array[0].x = {ego_pose.pose.position.x + vehicle_length/2, ego_pose.pose.position.y, ego_pose.pose.position.z};
     // ego_vehicle_data.corner_array[0].x = ego_pose.pose.position.x + vehicle_length/2;
@@ -204,7 +204,7 @@ void WhiteLineStopper::timerCallback(const ros::TimerEvent&)
     {
         pubStampedPoint(whiteline_itr->corner_array);
     }
-    // pubStampedPoint(ego_vehicle_pose);
+    // pubStampedPoint(ego_pose);
 
 
 }
@@ -233,12 +233,12 @@ void WhiteLineStopper::checkIntrusion()
 
     for (auto itr=whiteline_data_array.begin(); itr!=whiteline_data_array.end(); ++itr)
     {
-        distance = sqrt(pow(itr->pose.position.x - ego_vehicle_pose.position.x, 2) \
-                        + pow(itr->pose.position.y - ego_vehicle_pose.position.y, 2));
+        distance = sqrt(pow(itr->pose.position.x - ego_pose.position.x, 2) \
+                        + pow(itr->pose.position.y - ego_pose.position.y, 2));
 
         close_whiteline_id = itr->id;
         std::cout << "close_whiteline_id:" << close_whiteline_id << "distance:" << distance << std::endl;
-        if (distance < whiteline_deceleration)
+        if (distance < whiteline_deceleration && fabs(quatToRpy(itr->pose.orientation) - quatToRpy(ego_pose.orientation)) < )
         // if (distance < whiteline_deceleration && close_whiteline_id != passed_whiteline_id)
         {
             intrusion_decelerate_id = close_whiteline_id;
@@ -246,9 +246,9 @@ void WhiteLineStopper::checkIntrusion()
             for (int i=0; i<4; i++)
             {
                 outer_product[i] = (itr->corner_array[(i+1)%4].x - itr->corner_array[i].x) \
-                                * (ego_vehicle_pose.position.y - itr->corner_array[i].y) \
-                                - (ego_vehicle_pose.position.x - itr->corner_array[i].x) \
-                                * (itr->corner_array[(i+1)%4].y - itr->corner_array[i].y);
+                                 * (ego_pose.position.y - itr->corner_array[i].y) \
+                                 - (ego_pose.position.x - itr->corner_array[i].x) \
+                                 * (itr->corner_array[(i+1)%4].y - itr->corner_array[i].y);
 
 
             }
