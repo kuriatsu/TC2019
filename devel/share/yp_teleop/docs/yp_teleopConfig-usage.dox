@@ -1,13 +1,9 @@
 \subsubsection usage Usage
 \verbatim
 <node name="yp_teleop" pkg="yp_teleop" type="yp_teleop">
-  <param name="start_waypoint" type="str" value="0" />
-  <param name="final_waypoint" type="str" value="305" />
   <param name="base_speed" type="double" value="0.5" />
   <param name="dash" type="double" value="0.15" />
   <param name="max_twist_speed" type="double" value="0.8" />
-  <param name="acceleration_limit" type="double" value="0.25" />
-  <param name="deceleration_limit" type="double" value="0.33" />
   <param name="pub_rate" type="double" value="0.1" />
 </node>
 \endverbatim

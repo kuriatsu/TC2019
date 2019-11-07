@@ -4,8 +4,9 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <sound_play/sound_play.h>
 #include <dynamic_reconfigure/server.h>
-#include "teleop/yp_teleopConfig.h"
+#include "yp_teleop/yp_teleopConfig.h"
 #include "std_msgs/Int32.h"
+#include "std_msgs/Float32.h"
 
 #include <cmath>
 
@@ -16,28 +17,24 @@ class YpTeleop
     ros::Subscriber sub_joy;
     ros::Subscriber sub_twist;
     ros::Subscriber sub_closest_waypoint;
-    // ros::Subscriber sub_closest_obstacle;
+    ros::Subscriber sub_whiteline_stopper;
+    ros::Subscriber sub_safe_follow;
     ros::Publisher pub_yp_cmd;
     sound_play::SoundClient sc;
 
-
+    float vel_rate_whiteline_stopper;
+    float vel_rate_safe_follow;
     geometry_msgs::Twist in_twist;
     geometry_msgs::Twist out_twist;
     int triger_frag;
 
-    // int start_waypoint;
-    // int final_waypoint;
     float max_twist_speed;
-    // float accel;
-    // float accel_limit;
-    // float brake;
-    // float brake_limit;
     float pub_rate;
     float dash = 0;
     float base_speed = 0.5;
 
     ros::Timer timer;
-    bool rosbag_flag ;
+    bool rosbag_flag;
     bool auto_mode;
     int closest_waypoint;
 
@@ -51,13 +48,14 @@ class YpTeleop
     void joyCallback(const sensor_msgs::Joy &in_msg);
     void twistCallback(const geometry_msgs::TwistStamped &in_msg);
     void timerCallback(const ros::TimerEvent&);
-    // void closestWaypointCallback(const std_msgs::Int32 &in_msg);
     void dynamicCfgCallback(yp_teleop::yp_teleopConfig &config, uint32_t level);
     void checkSystemError(const int system_return);
+    void whiteLineStopperCallback(const std_msgs::Float32 &vel_rate);
+    void safeFollowCallback(const std_msgs::Float32 &vel_rate);
 };
 
 
-YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0)
+YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0), vel_rate_safe_follow(1.0), vel_rate_whiteline_stopper(1.0)
 {
     // initialize
     ros::NodeHandle n;
@@ -66,8 +64,10 @@ YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0)
 
     // ros communication
     sub_joy = n.subscribe("/joy", 1, &YpTeleop::joyCallback, this);
-    sub_twist = n.subscribe("/twist_cmd_helper", 1, &YpTeleop::twistCallback, this);
-    // sub_closest_waypoint = n.subscribe("/closest_waypoint", 1, &YpTeleop::closestWaypointCallback, this);
+    sub_twist = n.subscribe("/twist_cmd", 1, &YpTeleop::twistCallback, this);
+    sub_whiteline_stopper = n.subscribe("/vel_rate_whiteline_stopper", 1, &YpTeleop::whiteLineStopperCallback, this);
+    sub_whiteline_stopper = n.subscribe("/vel_rate_safe_follow", 1, &YpTeleop::safeFollowCallback, this);
+
     pub_yp_cmd = n.advertise<geometry_msgs::Twist>("/ypspur_ros/cmd_vel", 1);
 
     // for dynamic reconfigure
@@ -85,21 +85,11 @@ YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0)
 // get params from dynamic reconfigure
 void YpTeleop::dynamicCfgCallback(yp_teleop::yp_teleopConfig &config, uint32_t level)
 {
-    // start_waypoint = std::stoi(config.start_waypoint);
-    // final_waypoint = std::stoi(config.final_waypoint);
     base_speed = config.base_speed;
     dash = config.dash;
     max_twist_speed = config.max_twist_speed;
-    // accel_limit = config.acceleration_limit;
-    // brake_limit = config.deceleration_limit;
     pub_rate = config.pub_rate;
 }
-
-
-// void YpTeleop::closestWaypointCallback(const std_msgs::Int32 &in_msg)
-// {
-//     closest_waypoint = in_msg.data;
-// }
 
 
 void YpTeleop::timerCallback(const ros::TimerEvent&)
@@ -108,34 +98,9 @@ void YpTeleop::timerCallback(const ros::TimerEvent&)
     float current_twist_speed, aim_twist_speed;
 
     // limit speed with threshold set at the dynamic reconfigure
-    aim_twist_speed = in_twist.linear.x;
+    aim_twist_speed = in_twist.linear.x * vel_rate_whiteline_stopper * vel_rate_safe_follow;
     aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
     aim_twist_speed = (aim_twist_speed > -max_twist_speed) ? aim_twist_speed : -max_twist_speed;
-
-    // current_twist_speed = out_twist.linear.x;
-    //
-    // if (in_twist.linear.x >= 0.0)
-    // {
-    //     aim_twist_speed = (in_twist.linear.x + accel) * brake;
-    // }else
-    // {
-    //     aim_twist_speed = (in_twist.linear.x - accel) * brake;
-    // }
-    //
-    // aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
-    // aim_twist_speed = (aim_twist_speed > -max_twist_speed) ? aim_twist_speed : -max_twist_speed;
-    //
-    // // automode
-    // if(auto_mode)
-    // {
-    //     speed_change = aim_twist_speed - current_twist_speed;
-    //     if(speed_change > accel_limit * pub_rate)
-    //     {
-    //         aim_twist_speed = current_twist_speed + accel_limit * pub_rate * ((max_twist_speed - current_twist_speed) / max_twist_speed);
-    //     }
-    //     aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
-    //     aim_twist_speed = (aim_twist_speed > 0.0) ? aim_twist_speed : 0.0;
-    // }
 
     out_twist.linear.x = aim_twist_speed;
     out_twist.angular.z = in_twist.angular.z;
@@ -151,15 +116,18 @@ void YpTeleop::twistCallback(const geometry_msgs::TwistStamped &in_msg)
     {
         in_twist.linear.x = in_msg.twist.linear.x;
         in_twist.angular.z = in_msg.twist.angular.z;
-        // std::cout << in_twist.linear.x << std::endl;
-        // if (closest_waypoint > final_waypoint-5 /*&& in_twist.linear.x < base_speed*/)
-        // {
-        //     in_twist.linear.x = max_twist_speed;
-        // }
     }
 }
 
+void YpTeleop::safeFollowCallback(const std_msgs::Float32 &vel_rate)
+{
+    vel_rate_safe_follow = vel_rate.data;
+}
 
+void YpTeleop::whiteLineStopperCallback(const std_msgs::Float32 &vel_rate)
+{
+    vel_rate_whiteline_stopper = vel_rate.data;
+}
 // save twist value from joystick to buffer
 // start rosbag or any othe application
 void YpTeleop::joyCallback(const sensor_msgs::Joy &in_msg)

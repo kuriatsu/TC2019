@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/include/teleop/yp_teleopConfig.h
+/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/include/yp_teleop/yp_teleopConfig.h
 dynamic_reconfigure/config_tools.h
 -
 limits
@@ -37,10 +37,12 @@ sound_play/sound_play.h
 -
 dynamic_reconfigure/server.h
 -
-teleop/yp_teleopConfig.h
-/home/kuriatsu/Program/Ros/mad_mobile_ws/src/yp_teleop/src/teleop/yp_teleopConfig.h
+yp_teleop/yp_teleopConfig.h
+/home/kuriatsu/Program/Ros/mad_mobile_ws/src/yp_teleop/src/yp_teleop/yp_teleopConfig.h
 std_msgs/Int32.h
 /home/kuriatsu/Program/Ros/mad_mobile_ws/src/yp_teleop/src/std_msgs/Int32.h
+std_msgs/Float32.h
+/home/kuriatsu/Program/Ros/mad_mobile_ws/src/yp_teleop/src/std_msgs/Float32.h
 cmath
 -
 
@@ -1024,6 +1026,22 @@ ros/node_handle.h
 sound_play/SoundRequest.h
 -
 boost/thread.hpp
+-
+
+/opt/ros/kinetic/include/std_msgs/Float32.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
 -
 
 /opt/ros/kinetic/include/std_msgs/Header.h

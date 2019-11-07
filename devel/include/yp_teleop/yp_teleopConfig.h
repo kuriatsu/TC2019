@@ -236,24 +236,16 @@ class DEFAULT
         boost::any val;
         (*_i)->getValue(config, val);
 
-        if("start_waypoint"==(*_i)->name){start_waypoint = boost::any_cast<std::string>(val);}
-        if("final_waypoint"==(*_i)->name){final_waypoint = boost::any_cast<std::string>(val);}
         if("base_speed"==(*_i)->name){base_speed = boost::any_cast<double>(val);}
         if("dash"==(*_i)->name){dash = boost::any_cast<double>(val);}
         if("max_twist_speed"==(*_i)->name){max_twist_speed = boost::any_cast<double>(val);}
-        if("acceleration_limit"==(*_i)->name){acceleration_limit = boost::any_cast<double>(val);}
-        if("deceleration_limit"==(*_i)->name){deceleration_limit = boost::any_cast<double>(val);}
         if("pub_rate"==(*_i)->name){pub_rate = boost::any_cast<double>(val);}
       }
     }
 
-    std::string start_waypoint;
-std::string final_waypoint;
-double base_speed;
+    double base_speed;
 double dash;
 double max_twist_speed;
-double acceleration_limit;
-double deceleration_limit;
 double pub_rate;
 
     bool state;
@@ -265,19 +257,11 @@ double pub_rate;
 
 
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      std::string start_waypoint;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      std::string final_waypoint;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double base_speed;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double dash;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double max_twist_speed;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      double acceleration_limit;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      double deceleration_limit;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double pub_rate;
 //#line 228 "/opt/ros/kinetic/share/dynamic_reconfigure/cmake/../templates/ConfigType.h.template"
@@ -419,26 +403,6 @@ double pub_rate;
     {
 yp_teleopConfig::GroupDescription<yp_teleopConfig::DEFAULT, yp_teleopConfig> Default("Default", "", 0, 0, true, &yp_teleopConfig::groups);
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.start_waypoint = "";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.start_waypoint = "";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.start_waypoint = "0";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<std::string>("start_waypoint", "str", 0, "waipoint of start", "", &yp_teleopConfig::start_waypoint)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<std::string>("start_waypoint", "str", 0, "waipoint of start", "", &yp_teleopConfig::start_waypoint)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.final_waypoint = "";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.final_waypoint = "";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.final_waypoint = "305";
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<std::string>("final_waypoint", "str", 0, "waipoint of goal", "", &yp_teleopConfig::final_waypoint)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<std::string>("final_waypoint", "str", 0, "waipoint of goal", "", &yp_teleopConfig::final_waypoint)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __min__.base_speed = 0.0;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __max__.base_speed = 1.0;
@@ -468,26 +432,6 @@ yp_teleopConfig::GroupDescription<yp_teleopConfig::DEFAULT, yp_teleopConfig> Def
       Default.abstract_parameters.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("max_twist_speed", "double", 0, "velocity limit", "", &yp_teleopConfig::max_twist_speed)));
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __param_descriptions__.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("max_twist_speed", "double", 0, "velocity limit", "", &yp_teleopConfig::max_twist_speed)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.acceleration_limit = 0.0;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.acceleration_limit = 1.0;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.acceleration_limit = 0.25;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("acceleration_limit", "double", 0, "accelerarion limit m/s^2", "", &yp_teleopConfig::acceleration_limit)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("acceleration_limit", "double", 0, "accelerarion limit m/s^2", "", &yp_teleopConfig::acceleration_limit)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.deceleration_limit = 0.0;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.deceleration_limit = 1.0;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.deceleration_limit = 0.33;
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("deceleration_limit", "double", 0, "decelerarion limit m/s^2", "", &yp_teleopConfig::deceleration_limit)));
-//#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(yp_teleopConfig::AbstractParamDescriptionConstPtr(new yp_teleopConfig::ParamDescription<double>("deceleration_limit", "double", 0, "decelerarion limit m/s^2", "", &yp_teleopConfig::deceleration_limit)));
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __min__.pub_rate = 0.0;
 //#line 290 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
