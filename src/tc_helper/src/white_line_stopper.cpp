@@ -250,8 +250,8 @@ void WhiteLineStopper::checkIntrusion()
                         + pow(itr->pose.position.y - ego_pose.position.y, 2));
         ego_yaw = quatToRpy(ego_pose.orientation);
         line_yaw = quatToRpy(itr->pose.orientation);
-        inner_product = cos(ego_yaw) * sin(line_yaw) + sin(ego_yaw) * cos(line_yaw);
-
+        inner_product = cos(ego_yaw - line_yaw);
+        
         std::cout << whiteline_id << ", innter_prod = " << inner_product << ",dist" << relative_distance << std::endl;
         std::cout << "whiteline_yaw:" << quatToRpy(itr->pose.orientation) << "," << "ego_yaw:" << quatToRpy(ego_pose.orientation) << std::endl;
 
