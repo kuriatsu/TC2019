@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include "std_msgs/Int8.h"
+#include "std_msgs/Float32.h"
 #include "geometry_msgs/Point32.h"
 #include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/PointCloud.h"
@@ -18,6 +19,7 @@
 laser_geometry::LaserProjection projector2_;
 using namespace std;
 ros::Publisher vis_redzone,vis_outerzone,cloud_pub,twist_cmd_out;
+float vel_rate = 1.0;
 
 class cluster{
 public:
@@ -205,23 +207,28 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 void vel_callback(const geometry_msgs::TwistStampedConstPtr& in_vel)
 {
 	new_vel = true;
-	geometry_msgs::TwistStamped out_vel;
+	// geometry_msgs::TwistStamped out_vel;
 	if ((safe==false) || (decel==true))
 	  {
-		 out_vel.header = in_vel->header;
+		 // out_vel.header = in_vel->header;
 		 if (safe == false)
 		  {
-			 out_vel.twist.linear.x = 0.0;
-			 out_vel.twist.angular.z = 0.0;
+             vel_rate = 0.0;
+			 // out_vel.twist.linear.x = 0.0;
+			 // out_vel.twist.angular.z = 0.0;
+             std::cout << safe << std::endl;
+
 		  }
 		 else if (decel == true)
 		 {
-			 out_vel.twist.linear.x = (dis_closest_global/3.0)*in_vel->twist.linear.x;
-			 out_vel.twist.angular.z = (dis_closest_global/3.0)*in_vel->twist.angular.z;
+             vel_rate = dis_closest_global/3.0;
+             std::cout << dis_closest_global << std::endl;
+			 // out_vel.twist.linear.x = (dis_closest_global/3.0)*in_vel->twist.linear.x;
+			 // out_vel.twist.angular.z = (dis_closest_global/3.0)*in_vel->twist.angular.z;
 		 }
 	  }
-	else out_vel = *in_vel;
-	twist_cmd_out.publish(out_vel);
+	// else out_vel = *in_vel;
+	twist_cmd_out.publish(vel_rate);
 }
 
 int main(int argc,char **argv)
@@ -229,11 +236,12 @@ int main(int argc,char **argv)
 	 ros::init(argc,argv,"safe_follow");
 	 ros::NodeHandle nh;
 	 ros::Subscriber safe_sub = nh.subscribe("/scan",2,laser_callback); // subscribe to urg node's topic
-	 ros::Subscriber twist_cmd_in = nh.subscribe("twist_cmd",2,vel_callback);
+     // ros::Subscriber twist_cmd_in = nh.subscribe("/twist_raw",2,vel_callback);
+	 ros::Subscriber twist_cmd_in = nh.subscribe("/ypspur_ros/cmd_vel",2,vel_callback);
 	 vis_redzone = nh.advertise<visualization_msgs::Marker>("/vis_red",1);
 	 vis_outerzone = nh.advertise<visualization_msgs::Marker>("/viz_white",1);
 	 cloud_pub = nh.advertise<sensor_msgs::PointCloud>("/2dpoints",1);
-	 twist_cmd_out =  nh.advertise<geometry_msgs::TwistStamped>("/twist_cmd_safe",1);
+	 twist_cmd_out =  nh.advertise<std_msgs::Float32>("/vel_rate_safe_follow",1);
 	 int maxvel_count = 10;
 	 int i=0;
 	 ros::Rate r(40);
@@ -252,9 +260,10 @@ int main(int argc,char **argv)
                 out_vel.header.frame_id = "/velodyne";
                 out_vel.twist.linear.x = 0.0;
                 out_vel.twist.angular.z = 0.0;
-                twist_cmd_out.publish(out_vel);
+                twist_cmd_out.publish(vel_rate);
              }
         }
+        // std::cout << "spin" << std::endl;
         r.sleep();
 	 }
 	 return 0;

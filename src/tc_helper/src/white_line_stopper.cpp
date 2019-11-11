@@ -64,6 +64,7 @@ WhiteLineStopper::WhiteLineStopper(): passed_whiteline_id(0), intrusion_whitelin
 {
     ros::NodeHandle n;
 
+    std::cout << "hello" << std::endl;
     sub_joy = n.subscribe("/joy", 1, &WhiteLineStopper::joyCallback, this);
     sub_ndt_pose = n.subscribe("/ndt_pose", 1, &WhiteLineStopper::poseCallback, this);
     pub_corner = n.advertise<geometry_msgs::PointStamped>("/corner_points", 10);
@@ -77,7 +78,6 @@ WhiteLineStopper::WhiteLineStopper(): passed_whiteline_id(0), intrusion_whitelin
     // whiteline_deceleration = 3.0;
 
     // ego_vehicle_data.corner_array.resize(1);
-
     readFile("/home/kuriatsu/Program/Ros/mad_mobile_ws/src/tc_helper/white_line_list.csv");
     createWhiteLine();
 
@@ -251,7 +251,7 @@ void WhiteLineStopper::checkIntrusion()
         ego_yaw = quatToRpy(ego_pose.orientation);
         line_yaw = quatToRpy(itr->pose.orientation);
         inner_product = cos(ego_yaw - line_yaw);
-        
+
         std::cout << whiteline_id << ", innter_prod = " << inner_product << ",dist" << relative_distance << std::endl;
         std::cout << "whiteline_yaw:" << quatToRpy(itr->pose.orientation) << "," << "ego_yaw:" << quatToRpy(ego_pose.orientation) << std::endl;
 

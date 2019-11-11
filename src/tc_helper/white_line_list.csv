@@ -1,13 +1,14 @@
 id ,position.x,position.y,position.z,orientation.x,orientation.y,orientation.z,orientation.w,line_length,line_width,deceleration_range,inner_prod_thres,description
-1,-26.36010742,-25.80184364,0,0,0,0.010755355,0.999942159,2.0 ,1.0 ,2.0 ,0.0 ,zebra zone at the exit of the civil building
-2,-63.36015701,-29.18662453,0,0,0,-0.037750103,0.999287211,2.0 ,1.0 ,2.0 ,0.0 ,stop line at the exit of parking area
-3,-118.4317932,-25.19632912,0,0,0,-0.031629425,0.999499665,2.0 ,1.0 ,2.0 ,0.0 ,stop line at the entrance of parking area
-4,-206.6096039,60.94261932,0,0,0,-0.707945896,0.70626667,2.0 ,1.0 ,2.0 ,0.0 ,stopline in front of the zebra zone at the intersection 1
-5,-208.3419495,63.05927658,0,0,0,-0.005590542,0.999984373,2.0 ,1.0 ,2.0 ,0.0 ,zebra zone at the intersection 1
-6,-353.1743469,82.73977661,0,0,0,0.998497797,0.054791875,2.0 ,1.0 ,2.0 ,0.0 ,stop line in front of the zebra zone after the station
-7,-350.5005798,84.3766861,0,0,0,-0.865407521,0.501068681,2.0 ,1.0 ,2.0 ,0.0 ,zebra zone after the station
-8,-347.367157,96.15724945,0,0,0,0.68280201,0.73060346,2.0 ,1.0 ,2.0 ,0.0 ,stop line in front of the zebra zone at the exit of the park
-9,-348.0800476,91.71969604,0,0,0,0.694615341,0.719381351,2.0 ,1.0 ,2.0 ,0.0 ,zebra zone at the exit of the park
-10,-227.7535553,66.2515564,0,0,0,0.9996011,0.028242546,2.0 ,1.0 ,2.0 ,0.0 ,stop line in front of the zebra zone at the intersection
-11,-222.0045776,65.99292755,0,0,0,0.999859354,0.016771144,2.0 ,1.0 ,2.0 ,0.0 ,zebra zone at the intersection
-12,-124.1066818,-28.34940147,0,0,0,0.999745538,0.022557909,2.0 ,1.0 ,2.0 ,0.0 ,stop line at the exit of the parking area
+1,-26.48127937,-24.26063538,0,0,0,0.010755355,0.999942159,2,0.5,2,0,zebra zone at the exit of the civil building
+2,-62.61539459,-29.1499424,0,0,0,-0.037750103,0.999287211,2,0.5,2,0,stop line at the exit of parking area
+3,-139.3734131,-23.89615631,0,0,0,-0.031629425,0.999499665,2,0.5,2,0,stop line at the entrance of parking area
+4,-227.3440552,63.17158127,0,0,0,-0.707945896,0.70626667,2,0.6,2,0,stopline in front of the zebra zone at the intersection 1
+5,-228.5970154,64.83023071,0,0,0,-0.005590542,0.999984373,2,0.6,2,0,zebra zone at the intersection 1
+6,-374.109375,85.59264374,0,0,0,0.998497797,0.054791875,2,0.5,2,0,stop line in front of the zebra zone after the station
+7,-371.3097839,86.48588562,0,0,0,-0.865407521,0.501068681,2,0.5,2,0,zebra zone after the station
+8,-367.9780579,98.81778717,0,0,0,0.68280201,0.73060346,2,0.5,2,0,stop line in front of the zebra zone at the exit of the park
+9,-368.0811768,94.25588989,0,0,0,0.694615341,0.719381351,2,0.5,2,0,zebra zone at the exit of the park
+10,-248.4205322,68.39483643,0,0,0,0.9996011,0.028242546,2,0.5,2,0,stop line in front of the zebra zone at the intersection
+11,-242.9183197,68.04853821,0,0,0,0.999859354,0.016771144,2,0.5,2,0,zebra zone at the intersection
+12,-145.1830444,-27.99549294,0,0,0,0.999745538,0.022557909,2,0.5,2,0,stop line at the exit of the parking area
+13,-78.0607605,-33.17024994,0,0,0,0.999745538,0.022557909,2,0.5,2,0,goal

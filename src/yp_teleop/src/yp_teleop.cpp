@@ -64,9 +64,9 @@ YpTeleop::YpTeleop(): auto_mode(false), triger_frag(0), rosbag_flag(0), vel_rate
 
     // ros communication
     sub_joy = n.subscribe("/joy", 1, &YpTeleop::joyCallback, this);
-    sub_twist = n.subscribe("/twist_cmd", 1, &YpTeleop::twistCallback, this);
+    sub_twist = n.subscribe("/twist_cmd_safe", 1, &YpTeleop::twistCallback, this);
     sub_whiteline_stopper = n.subscribe("/vel_rate_whiteline_stopper", 1, &YpTeleop::whiteLineStopperCallback, this);
-    sub_whiteline_stopper = n.subscribe("/vel_rate_safe_follow", 1, &YpTeleop::safeFollowCallback, this);
+    sub_safe_follow = n.subscribe("/vel_rate_safe_follow", 1, &YpTeleop::safeFollowCallback, this);
 
     pub_yp_cmd = n.advertise<geometry_msgs::Twist>("/ypspur_ros/cmd_vel", 1);
 
@@ -95,15 +95,16 @@ void YpTeleop::dynamicCfgCallback(yp_teleop::yp_teleopConfig &config, uint32_t l
 void YpTeleop::timerCallback(const ros::TimerEvent&)
 {
     float speed_change;
-    float current_twist_speed, aim_twist_speed;
+    float current_twist_speed, aim_twist_speed, aim_twist_angular;
 
     // limit speed with threshold set at the dynamic reconfigure
-    aim_twist_speed = in_twist.linear.x * vel_rate_whiteline_stopper * vel_rate_safe_follow;
     aim_twist_speed = (aim_twist_speed < max_twist_speed) ? aim_twist_speed : max_twist_speed;
     aim_twist_speed = (aim_twist_speed > -max_twist_speed) ? aim_twist_speed : -max_twist_speed;
 
+    aim_twist_speed = in_twist.linear.x * vel_rate_whiteline_stopper * vel_rate_safe_follow;
+    aim_twist_angular = in_twist.angular.z * vel_rate_whiteline_stopper * vel_rate_safe_follow;
     out_twist.linear.x = aim_twist_speed;
-    out_twist.angular.z = in_twist.angular.z;
+    out_twist.angular.z = aim_twist_angular;
     pub_yp_cmd.publish(out_twist);
 }
 
