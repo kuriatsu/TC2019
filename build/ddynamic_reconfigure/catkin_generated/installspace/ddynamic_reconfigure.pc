@@ -1,8 +1,0 @@
-prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/install
-
-Name: ddynamic_reconfigure
-Description: Description of ddynamic_reconfigure
-Version: 0.2.2
-Cflags: -I/home/kuriatsu/Program/Ros/mad_mobile_ws/install/include
-Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/install/lib -lddynamic_reconfigure
-Requires: roscpp dynamic_reconfigure

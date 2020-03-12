@@ -1,8 +1,0 @@
-prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/install
-
-Name: tc_helper
-Description: Description of tc_helper
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/install/lib 
-Requires: 

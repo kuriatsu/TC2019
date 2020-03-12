@@ -1,8 +1,0 @@
-prefix=/home/kuriatsu/Program/Ros/mad_mobile_ws/devel
-
-Name: test_tools
-Description: Description of test_tools
-Version: 0.0.0
-Cflags: -I/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/include
-Libs: -L/home/kuriatsu/Program/Ros/mad_mobile_ws/devel/lib 
-Requires: message_runtime
